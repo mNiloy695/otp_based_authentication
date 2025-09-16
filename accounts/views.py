@@ -37,7 +37,7 @@ def RegistrationView(request):
          message=f"Your OTP is {code}"
          receiver_email=user.email
         
-         send_email(subject,message,receiver_email)
+         send_email.delay(subject,message,receiver_email)
  
          return Response({
             "message": "Account created successfully. Check your email for the activation code.",
@@ -69,6 +69,7 @@ def active_account_view(request,uid64,token):
               return Response({"info": "Account already active"}, status=status.HTTP_200_OK)
         else:
            return Response({"error": "Activation link is invalid or expired"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors)
         
 
 @api_view(['GET','PATCH','PUT'])
@@ -144,7 +145,7 @@ class ForgetOTPPasswordView(APIView):
          subject="Password Reset OTP"
          message=f"Hi {user.username} your password reset otp is {code} .It Valid for 5 munites"
          receiver_email=user.email
-         send_email(subject,message,receiver_email)
+         send_email.delay(subject,message,receiver_email)
          return Response({
             "message":"OTP Send To Your email Check it",
             "password_reset_url":"http://127.0.0.1:8000/account/reset_password/"
